@@ -1,0 +1,28 @@
+name: Create Maath File
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  create-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create file with exactly 10000 lines
+        run: |
+          yes 'معاذ الشعري' | head -n 10000 > 'معاذ الشعري. pine'
+          test "$(wc -l < 'معاذ الشعري. pine')" -eq 10000
+      - name: Commit file
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 'معاذ الشعري. pine'
+          git commit -m 'إضافة ملف معاذ الشعري مكرر 10000 سطر'
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/create-maath-file.yml
+          git add -A
+          git diff --cached --quiet || git commit -m 'حذف ملف workflow المؤقت'
+          git push || true
